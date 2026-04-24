@@ -1,0 +1,28 @@
+apiVersion: kaptain.org/1.13
+kind: docker-build-retag
+
+spec:
+  global:
+    projectName:
+      stripRepositoryNamePrefix: test
+    release:
+      versioning:
+        strategy: file-pattern-match
+        patternType: dockerfile-env-kubectl
+        source:
+          subPath: src/docker
+          fileName: Dockerfile
+  main:
+    docker:
+      retag:
+        sourceRegistry: docker.io
+        sourceNamespace: library
+        sourceImageName: alpine
+        sourceTag: '3.21'
+    hooks:
+      preBuild: test-hooks/pre-build.bash
+      preTaggingTests: test-hooks/pre-tagging-tests.bash
+      postVersionsAndNaming: test-hooks/post-versions-and-naming.bash
+      preDockerPrepare: test-hooks/pre-docker-prepare.bash
+      postDockerTests: test-hooks/post-docker-tests.bash
+      postBuild: test-hooks/post-build.bash
